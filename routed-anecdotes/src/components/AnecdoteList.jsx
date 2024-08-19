@@ -2,6 +2,10 @@ import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 
 const AnecdoteList = ({ anecdotes }) => {
+  if (!anecdotes || anecdotes.length === 0) {
+    return <div>No anecdotes available.</div>
+  }
+
   return (
     <div>
       <h2>Anecdotes</h2>

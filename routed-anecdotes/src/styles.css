@@ -1,0 +1,5 @@
+/* styles.css */
+
+.SingleAnecdoteView div {
+  margin-bottom: 20px; /* Adds space between div elements */
+}
