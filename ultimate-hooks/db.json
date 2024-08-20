@@ -1,0 +1,42 @@
+{
+  "notes": [
+    {
+      "id": 1,
+      "content": "custom-hooks are awesome!"
+    },
+    {
+      "id": 2,
+      "content": "best feature ever <3"
+    },
+    {
+      "content": "this is a new note",
+      "id": 3
+    },
+    {
+      "content": "new reset test note",
+      "id": 4
+    }
+  ],
+  "persons": [
+    {
+      "id": 1,
+      "name": "mluukkai",
+      "number": "040-5483923"
+    },
+    {
+      "id": 2,
+      "name": "hellas",
+      "number": "012-123123"
+    },
+    {
+      "name": "phil",
+      "number": "01235434",
+      "id": 3
+    },
+    {
+      "name": "resetperson",
+      "number": "resetnumber",
+      "id": 4
+    }
+  ]
+}
