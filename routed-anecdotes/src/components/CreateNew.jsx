@@ -2,18 +2,28 @@ import PropTypes from 'prop-types'
 import { useField } from '../hooks'
 
 const CreateNew = ({ addNew }) => {
-  const content = useField('text')
-  const author = useField('text')
-  const info = useField('url')
+  const { onReset: resetContent, ...contentFields } = useField('text')
+  const { onReset: resetAuthor, ...authorFields } = useField('text')
+  const { onReset: resetInfo, ...infoFields } = useField('text')
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    addNew({
-      content: content.value,
-      author: author.value,
-      info: info.value,
-      votes: 0
-    })
+    const content = contentFields.value
+    const author = authorFields.value
+    const info = infoFields.value
+    if (content && author && info) {
+      addNew({
+        content,
+        author,
+        info,
+        votes: 0
+      })
+    }
+  }
+  const handleReset = () => {
+    resetContent()
+    resetAuthor()
+    resetInfo()
   }
 
   return (
@@ -22,17 +32,20 @@ const CreateNew = ({ addNew }) => {
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input {...content} />
+          <input {...contentFields} />
         </div>
         <div>
           author
-          <input {...author} />
+          <input {...authorFields} />
         </div>
         <div>
           url for more info
-          <input {...info} />
+          <input {...infoFields} />
         </div>
-        <button>create</button>
+        <button type="submit">create</button>
+        <button type="button " onClick={handleReset}>
+          reset
+        </button>
       </form>
     </div>
   )
