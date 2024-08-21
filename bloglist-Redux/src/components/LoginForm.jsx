@@ -1,15 +1,31 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
+import { userLogin } from '../reducers/userAuthReducer'
+import { notificationService } from '../reducers/notificationReducer'
 
 const LoginForm = ({ transferLoginToParent }) => {
-  const [username, setUsername] = useState([''])
-  const [password, setPassword] = useState([''])
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
 
+  const dispatch = useDispatch()
   const handleSubmit = (event) => {
     event.preventDefault()
-    transferLoginToParent(username, password)
-    setPassword('')
-    setUsername('')
+    try {
+      dispatch(userLogin(username, password))
+      setPassword('')
+      setUsername('')
+    } catch (exception) {
+      if (exception?.response?.data?.error) {
+        dispatch(
+          notificationService(
+            `Error: while userLogin : ${exception.response.data.error} `
+          )
+        )
+      } else {
+        console.log(exception.message)
+      }
+    }
   }
 
   return (

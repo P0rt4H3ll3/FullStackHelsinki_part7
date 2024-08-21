@@ -6,49 +6,27 @@ import LoginForm from './components/LoginForm.jsx'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import Togglable from './components/Togglable.jsx'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { initializeBlogs } from './reducers/blogReducer.js'
+import { alreadyLoggedIn, userLogout } from './reducers/userAuthReducer.js'
 
 const App = () => {
-  const [user, setUser] = useState(null)
   const dispatch = useDispatch()
+  const user = useSelector(({ userAuth }) => userAuth.user)
+  console.log('this is the user', user)
   useEffect(() => {
     dispatch(initializeBlogs())
   }, [dispatch])
 
   useEffect(() => {
-    //user already logged in,
-    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      setUser(user)
-      blogService.setToken(user.token)
-    }
-  }, [])
-
-  const handleLogin = async (username, password) => {
-    try {
-      const user = await loginService.login({
-        username,
-        password
-      })
-      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
-      blogService.setToken(user.token)
-      setUser(user)
-      console.log(`logged in as ${user.name}`)
-    } catch (exception) {
-      console.log(`Error : ${exception.response.data.error}`)
-    }
-    //user Username Phillip1 use password Password
-  }
+    dispatch(alreadyLoggedIn())
+  }, [dispatch])
 
   const handleLogout = () => {
-    window.localStorage.removeItem('loggedBlogappUser')
-    setUser(null)
-    console.log('logged out')
+    dispatch(userLogout())
   }
   const loginForm = () => {
-    return <LoginForm transferLoginToParent={handleLogin} />
+    return <LoginForm />
   }
 
   const blogFormRef = useRef()
