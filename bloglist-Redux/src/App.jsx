@@ -1,17 +1,20 @@
 import { useState, useEffect, useRef } from 'react'
-import Blog from './components/Blog'
+import BlogList from './components/BlogList'
 import Notification from './components/Notification.jsx'
 import BlogForm from './components/BlogForm.jsx'
 import LoginForm from './components/LoginForm.jsx'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import Togglable from './components/Togglable.jsx'
+import { useDispatch } from 'react-redux'
+import { initializeBlogs } from './reducers/blogReducer.js'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
-  const [newBlog, setNewBlog] = useState('')
-  const [message, setMessage] = useState(null)
   const [user, setUser] = useState(null)
+  const dispatch = useDispatch()
+  useEffect(() => {
+    dispatch(initializeBlogs())
+  }, [dispatch])
 
   useEffect(() => {
     //user already logged in,
@@ -23,75 +26,6 @@ const App = () => {
     }
   }, [])
 
-  useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
-  }, [])
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setMessage(null)
-    }, 5000)
-    return () => {
-      clearTimeout(timer)
-    }
-  }, [message])
-
-  const createNewBlog = async (newBlogObject) => {
-    blogFormRef.current.toggleVisibility() // creating a new blog, this toggles visibility
-    try {
-      const newBlog = await blogService.create(newBlogObject)
-      setBlogs(blogs.concat(newBlog))
-      setMessage(`new blog ${newBlog.title} by ${newBlog.author} added`)
-    } catch (exception) {
-      setMessage(
-        `An Error Occured while creating a new blog:${exception.response.data.error}`
-      )
-    }
-  }
-
-  const updateBlog = async (updatedBlogObject) => {
-    const { id } = updatedBlogObject
-    try {
-      const updateBlogRes = await blogService.update(id, updatedBlogObject)
-      setBlogs(blogs.map((blog) => (blog.id !== id ? blog : updateBlogRes)))
-      setMessage(
-        `blog ${updateBlogRes.title} by ${updateBlogRes.author} was updated`
-      )
-    } catch (exception) {
-      if (
-        exception.response &&
-        exception.response.data &&
-        exception.response.data.error
-      ) {
-        setMessage(
-          `An Error Occured while updating the blog: ${exception.response.data.error}`
-        )
-      } else {
-        setMessage(`An Error Occured: ${exception.message}`)
-      }
-    }
-  }
-
-  const deleteBlog = async (id) => {
-    try {
-      await blogService.deleteBlog(id)
-      setBlogs(blogs.filter((blog) => blog.id !== id))
-      setMessage('deleted blog')
-    } catch (exception) {
-      if (
-        exception.response &&
-        exception.response.data &&
-        exception.response.data.error
-      ) {
-        setMessage(
-          `An Error Occured while deleting the blog: ${exception.response.data.error}`
-        )
-      } else {
-        setMessage(`An Error Occured: ${exception.message}`)
-      }
-    }
-  }
-
   const handleLogin = async (username, password) => {
     try {
       const user = await loginService.login({
@@ -101,9 +35,9 @@ const App = () => {
       window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
       blogService.setToken(user.token)
       setUser(user)
-      setMessage(`logged in as ${user.name}`)
+      console.log(`logged in as ${user.name}`)
     } catch (exception) {
-      setMessage(`Error : ${exception.response.data.error}`)
+      console.log(`Error : ${exception.response.data.error}`)
     }
     //user Username Phillip1 use password Password
   }
@@ -111,7 +45,7 @@ const App = () => {
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogappUser')
     setUser(null)
-    setMessage('logged out')
+    console.log('logged out')
   }
   const loginForm = () => {
     return <LoginForm transferLoginToParent={handleLogin} />
@@ -121,7 +55,7 @@ const App = () => {
   const blogForm = () => {
     return (
       <Togglable buttonLable="new blog" ref={blogFormRef}>
-        <BlogForm createNewBlog={createNewBlog} />
+        <BlogForm blogFormRef={blogFormRef} />
       </Togglable>
     )
   }
@@ -129,7 +63,7 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
-      <Notification message={message} />
+      <Notification />
       {user === null ? (
         loginForm()
       ) : (
@@ -137,17 +71,7 @@ const App = () => {
           <p>{user.name} logged in</p>
           <button onClick={handleLogout}>Logout</button>
           {blogForm()}
-          {blogs
-            .sort((a, b) => b.likes - a.likes)
-            .map((blog) => (
-              <Blog
-                key={blog.id}
-                blog={blog}
-                transferIdToParent={updateBlog}
-                username={user.username}
-                transferIdToDelete={deleteBlog}
-              />
-            ))}
+          <BlogList user={user} />
         </div>
       )}
     </div>

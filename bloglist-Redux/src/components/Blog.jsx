@@ -3,7 +3,7 @@ import { useState } from 'react'
 import PropTypes from 'prop-types'
 import { notificationService } from '../reducers/notificationReducer'
 
-const Blog = ({ blog, transferIdToParent, username, transferIdToDelete }) => {
+const Blog = ({ blog, likeHandler, username, deleteHandler }) => {
   const dispatch = useDispatch()
 
   const [visible, setVisible] = useState(false)
@@ -17,23 +17,6 @@ const Blog = ({ blog, transferIdToParent, username, transferIdToDelete }) => {
 
   const toggleVisibility = () => {
     setVisible(!visible)
-  }
-
-  const updateLikeHandler = () => {
-    transferIdToParent({
-      title: blog.title,
-      author: blog.author,
-      url: blog.url,
-      likes: blog.likes + 1,
-      id: blog.id
-    })
-    dispatch(notificationService(`You Liked Blog : ${blog.title}`))
-  }
-
-  const deleteHandler = () => {
-    if (window.confirm(`Remove Blog: ${blog.title} by ${blog.author}`)) {
-      transferIdToDelete(blog.id)
-    }
   }
 
   return (
@@ -50,7 +33,7 @@ const Blog = ({ blog, transferIdToParent, username, transferIdToDelete }) => {
           <div>{blog.url}</div>
           <div>
             <span>likes: {blog.likes}</span>
-            <button onClick={updateLikeHandler} className="blogLikeButton">
+            <button onClick={likeHandler} className="blogLikeButton">
               likes
             </button>
           </div>
@@ -85,8 +68,8 @@ const Blog = ({ blog, transferIdToParent, username, transferIdToDelete }) => {
 
 Blog.propTypes = {
   blog: PropTypes.object.isRequired,
-  transferIdToParent: PropTypes.func.isRequired,
-  username: PropTypes.string.isRequired,
-  transferIdToDelete: PropTypes.func.isRequired
+  likeHandler: PropTypes.func.isRequired,
+  //username: PropTypes.string.isRequired,
+  deleteHandler: PropTypes.func.isRequired
 }
 export default Blog

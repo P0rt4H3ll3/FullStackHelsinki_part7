@@ -1,17 +1,36 @@
-import { useState } from 'react'
+import { useField } from '../hooks/index'
 import PropTypes from 'prop-types'
+import { createBlog } from '../reducers/blogReducer'
+import { useDispatch } from 'react-redux'
+import { notificationService } from '../reducers/notificationReducer'
 
-const BlogForm = ({ createNewBlog }) => {
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
+const BlogForm = ({ blogFormRef }) => {
+  const dispatch = useDispatch()
+  const { onReset: resetTitle, ...titleFields } = useField('text')
+  const { onReset: resetAuthor, ...authorFields } = useField('text')
+  const { onReset: resetUrl, ...urlFields } = useField('text')
 
-  const handleCreate = (event) => {
+  const handleCreate = async (event) => {
     event.preventDefault()
-    createNewBlog({ title, author, url })
-    setTitle('')
-    setAuthor('')
-    setUrl('')
+    const newBlog = {
+      title: titleFields.value,
+      author: authorFields.value,
+      url: urlFields.value
+    }
+    try {
+      dispatch(createBlog(newBlog))
+      dispatch(
+        notificationService(
+          `new Blog by the title:${newBlog.title} and author:${newBlog.author} was created`
+        )
+      )
+      resetAuthor()
+      resetTitle()
+      resetUrl()
+      blogFormRef.current.toggleVisibility()
+    } catch (error) {
+      dispatch(notificationService(`Error: inside handleCreate ${error}`))
+    }
   }
 
   return (
@@ -23,11 +42,8 @@ const BlogForm = ({ createNewBlog }) => {
             <td>title:</td>
             <td>
               <input
-                type="text"
-                name="title"
-                value={title}
+                {...titleFields}
                 className="titleInput"
-                onChange={({ target }) => setTitle(target.value)}
                 data-testid="blog-title"
               />
             </td>
@@ -37,11 +53,8 @@ const BlogForm = ({ createNewBlog }) => {
             <td>author:</td>
             <td>
               <input
-                type="text"
-                name="author"
-                value={author}
+                {...authorFields}
                 className="authorInput"
-                onChange={({ target }) => setAuthor(target.value)}
                 data-testid="blog-author"
               />
             </td>
@@ -51,11 +64,8 @@ const BlogForm = ({ createNewBlog }) => {
             <td>url:</td>
             <td>
               <input
-                type="text"
-                name="url"
-                value={url}
+                {...urlFields}
                 className="urlInput"
-                onChange={({ target }) => setUrl(target.value)}
                 data-testid="blog-url"
               />
             </td>
@@ -70,8 +80,8 @@ const BlogForm = ({ createNewBlog }) => {
   )
 }
 
-BlogForm.propTypes = {
-  createNewBlog: PropTypes.func.isRequired
-}
+// BlogForm.propTypes = {
+//   createNewBlog: PropTypes.func.isRequired
+// }
 
 export default BlogForm
