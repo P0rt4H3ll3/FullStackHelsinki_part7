@@ -15,6 +15,13 @@ const App = () => {
   const [user, setUser] = useState(null)
   const messageDispatch = useNotificationDispatch()
 
+  const result = useQuery({
+    queryKey: ['blogs'],
+    queryFn: async () => await blogService.getAll(),
+    refetchOnWindowFocus: false
+  })
+  const blogs = result.data
+
   const newBlogMutation = useMutation({
     mutationFn: async (newBlogObject) =>
       await blogService.create(newBlogObject),
@@ -33,12 +40,49 @@ const App = () => {
     }
   })
 
-  const result = useQuery({
-    queryKey: ['blogs'],
-    queryFn: async () => await blogService.getAll()
+  const updateBlogMutation = useMutation({
+    mutationFn: async (blog) => await blogService.update(blog),
+    onSuccess: (blogResponse) => {
+      const blogs = queryClient.getQueryData(['blogs'])
+      queryClient.setQueriesData(
+        ['blogs'],
+        blogs.map((b) => (b.id !== blogResponse.id ? b : blogResponse))
+      )
+
+      messageDispatch({
+        type: 'SET_NOTIFICATION',
+        payload: `blog ${blogResponse.title} by ${blogResponse.author} was updated`
+      })
+    },
+    onError: (exception) => {
+      messageDispatch({
+        type: 'SET_NOTIFICATION',
+        payload: `An Error Occured while updating the blog: ${exception.response.data.error}`
+      })
+    }
   })
 
-  const blogs = result.data
+  const deleteBlogMutation = useMutation({
+    mutationFn: async (blog) => await blogService.deleteBlog(blog),
+    onSuccess: (_, variables) => {
+      const blogs = queryClient.getQueryData(['blogs'])
+      queryClient.setQueriesData(
+        ['blogs'],
+        blogs.filter((b) => b.id !== variables.id)
+      )
+
+      messageDispatch({
+        type: 'SET_NOTIFICATION',
+        payload: 'deleted Blog'
+      })
+    },
+    onError: (exception) => {
+      messageDispatch({
+        type: 'SET_NOTIFICATION',
+        payload: `An Error Occured while updating the blog: ${exception.response.data.error}`
+      })
+    }
+  })
 
   useEffect(() => {
     //user already logged in,
@@ -55,60 +99,13 @@ const App = () => {
     newBlogMutation.mutate(newBlogObject)
   }
 
-  // const updateBlog = async (updatedBlogObject) => {
-  //   const { id } = updatedBlogObject
-  //   try {
-  //     const updateBlogRes = await blogService.update(id, updatedBlogObject)
-  //     setBlogs(blogs.map((blog) => (blog.id !== id ? blog : updateBlogRes)))
-  //     messageDispatch({
-  //       type: 'SET_NOTIFICATION',
-  //       payload: `blog ${updateBlogRes.title} by ${updateBlogRes.author} was updated`
-  //     })
-  //   } catch (exception) {
-  //     if (
-  //       exception.response &&
-  //       exception.response.data &&
-  //       exception.response.data.error
-  //     ) {
-  //       messageDispatch({
-  //         type: 'SET_NOTIFICATION',
-  //         payload: `An Error Occured while updating the blog: ${exception.response.data.error}`
-  //       })
-  //     } else {
-  //       messageDispatch({
-  //         type: 'SET_NOTIFICATION',
-  //         payload: `An Error Occured: ${exception.message}`
-  //       })
-  //     }
-  //   }
-  // }
+  const updateBlog = async (updatedBlogObject) => {
+    updateBlogMutation.mutate(updatedBlogObject)
+  }
 
-  // const deleteBlog = async (id) => {
-  //   try {
-  //     await blogService.deleteBlog(id)
-  //     setBlogs(blogs.filter((blog) => blog.id !== id))
-  //     messageDispatch({
-  //       type: 'SET_NOTIFICATION',
-  //       payload: 'deleted blog'
-  //     })
-  //   } catch (exception) {
-  //     if (
-  //       exception.response &&
-  //       exception.response.data &&
-  //       exception.response.data.error
-  //     ) {
-  //       messageDispatch({
-  //         type: 'SET_NOTIFICATION',
-  //         payload: `An Error Occured while deleting the blog: ${exception.response.data.error}`
-  //       })
-  //     } else {
-  //       messageDispatch({
-  //         type: 'SET_NOTIFICATION',
-  //         payload: `An Error Occured: ${exception.message}`
-  //       })
-  //     }
-  //   }
-  // }
+  const deleteBlog = async (deleteBlogObject) => {
+    deleteBlogMutation.mutate(deleteBlogObject)
+  }
 
   const handleLogin = async (username, password) => {
     try {
@@ -167,7 +164,13 @@ const App = () => {
           {blogs
             .sort((a, b) => b.likes - a.likes)
             .map((blog) => (
-              <Blog key={blog.id} blog={blog} username={user.username} />
+              <Blog
+                key={blog.id}
+                blog={blog}
+                username={user.username}
+                transferIdToParent={updateBlog}
+                transferIdToDelete={deleteBlog}
+              />
             ))}
         </div>
       )}

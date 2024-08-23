@@ -21,7 +21,8 @@ const create = async (newBlogObject) => {
   return response.data
 }
 
-const update = async (id, updatedBlogObject) => {
+const update = async (updatedBlogObject) => {
+  const { id } = updatedBlogObject
   const response = await axios.put(
     `${baseUrl}/${id}`,
     updatedBlogObject,
@@ -30,7 +31,8 @@ const update = async (id, updatedBlogObject) => {
   return response.data
 }
 
-const deleteBlog = async (id) => {
+const deleteBlog = async (blog) => {
+  const { id } = blog
   const response = await axios.delete(`${baseUrl}/${id}`, config(token))
   return response.data
 }

@@ -27,7 +27,7 @@ const Blog = ({ blog, transferIdToParent, username, transferIdToDelete }) => {
 
   const deleteHandler = () => {
     if (window.confirm(`Remove Blog: ${blog.title} by ${blog.author}`)) {
-      transferIdToDelete(blog.id)
+      transferIdToDelete(blog)
     }
   }
 
