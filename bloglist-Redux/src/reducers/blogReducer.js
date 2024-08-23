@@ -17,7 +17,6 @@ const blogSlice = createSlice({
 export const { setBlogs, appendBlog, increaseLike } = blogSlice.actions
 
 export const initializeBlogs = () => {
-  console.log('inside initializeBlogs in reducer')
   return async (dispatch) => {
     const blogs = await blogService.getAll()
     dispatch(setBlogs(blogs))

@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux'
 import { userLogin } from '../reducers/userAuthReducer'
 import { notificationService } from '../reducers/notificationReducer'
 
-const LoginForm = ({ transferLoginToParent }) => {
+const LoginForm = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
@@ -58,7 +58,5 @@ const LoginForm = ({ transferLoginToParent }) => {
   )
 }
 
-LoginForm.propTypes = {
-  transferLoginToParent: PropTypes.func.isRequired
-}
+
 export default LoginForm

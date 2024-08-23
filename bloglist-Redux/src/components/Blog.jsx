@@ -1,11 +1,7 @@
-import { useDispatch, useSelector } from 'react-redux'
 import { useState } from 'react'
 import PropTypes from 'prop-types'
-import { notificationService } from '../reducers/notificationReducer'
 
 const Blog = ({ blog, likeHandler, username, deleteHandler }) => {
-  const dispatch = useDispatch()
-
   const [visible, setVisible] = useState(false)
   const blogStyle = {
     paddingTop: 10,

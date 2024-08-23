@@ -1,5 +1,4 @@
 import { useField } from '../hooks/index'
-import PropTypes from 'prop-types'
 import { createBlog } from '../reducers/blogReducer'
 import { useDispatch } from 'react-redux'
 import { notificationService } from '../reducers/notificationReducer'
@@ -8,7 +7,7 @@ const BlogForm = ({ blogFormRef }) => {
   const dispatch = useDispatch()
   const { onReset: resetTitle, ...titleFields } = useField('text')
   const { onReset: resetAuthor, ...authorFields } = useField('text')
-  const { onReset: resetUrl, ...urlFields } = useField('text')
+  const { onReset: resetUrl, ...urlFields } = useField('url')
 
   const handleCreate = async (event) => {
     event.preventDefault()

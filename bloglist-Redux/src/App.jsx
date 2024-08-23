@@ -3,8 +3,6 @@ import BlogList from './components/BlogList'
 import Notification from './components/Notification.jsx'
 import BlogForm from './components/BlogForm.jsx'
 import LoginForm from './components/LoginForm.jsx'
-import blogService from './services/blogs'
-import loginService from './services/login'
 import Togglable from './components/Togglable.jsx'
 import { useDispatch, useSelector } from 'react-redux'
 import { initializeBlogs } from './reducers/blogReducer.js'
@@ -13,12 +11,12 @@ import { alreadyLoggedIn, userLogout } from './reducers/userAuthReducer.js'
 const App = () => {
   const dispatch = useDispatch()
   const user = useSelector(({ userAuth }) => userAuth.user)
-  console.log('this is the user', user)
-  useEffect(() => {
+
+  useEffect(() => { //fetch initial blocks
     dispatch(initializeBlogs())
   }, [dispatch])
 
-  useEffect(() => {
+  useEffect(() => { //see if there is already logininformation in localstorage
     dispatch(alreadyLoggedIn())
   }, [dispatch])
 
