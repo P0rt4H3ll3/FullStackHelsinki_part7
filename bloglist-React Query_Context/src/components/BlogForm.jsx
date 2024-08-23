@@ -1,19 +1,55 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
+import { useNotificationDispatch } from '../NotificatonContext.jsx'
+import blogService from '../services/blogs'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-const BlogForm = ({ createNewBlog }) => {
+const BlogForm = ({ blogFormRef }) => {
+  // --------------------------------STATE------------------------------------------
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
 
+  // --------------------------------STATE------------------------------------------
+  // --------------------------------HOOKS------------------------------------------
+
+  const queryClient = useQueryClient()
+  const messageDispatch = useNotificationDispatch()
+
+  // --------------------------------HOOKS------------------------------------------
+
+  // --------------------------------CREATE NEW---------------------------------------
+
+  const newBlogMutation = useMutation({
+    mutationFn: async (newBlogObject) =>
+      await blogService.create(newBlogObject),
+    onSuccess: (blogResponse) => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] })
+      messageDispatch({
+        type: 'SET_NOTIFICATION',
+        payload: `new blog ${blogResponse.title} by ${blogResponse.author} added`
+      })
+    },
+    onError: (exception) => {
+      messageDispatch({
+        type: 'SET_NOTIFICATION',
+        payload: `An Error Occured while creating a new blog:${exception.response.data.error}`
+      })
+    }
+  })
+
   const handleCreate = (event) => {
     event.preventDefault()
-    createNewBlog({ title, author, url })
+    newBlogMutation.mutate({ title, author, url })
     setTitle('')
     setAuthor('')
     setUrl('')
+    blogFormRef.current.toggleVisibility() // creating a new blog, this toggles visibility
   }
 
+  // --------------------------------CREATE NEW---------------------------------------
+
+  // --------------------------------RETURN COMPONENT-----------------------------------------
   return (
     <form onSubmit={handleCreate}>
       <h2>create new</h2>
@@ -70,8 +106,14 @@ const BlogForm = ({ createNewBlog }) => {
   )
 }
 
+// --------------------------------RETURN COMPONENT-----------------------------------------
+
+// --------------------------------PROP VALIDATION-----------------------------------
+
 BlogForm.propTypes = {
-  createNewBlog: PropTypes.func.isRequired
+  blogFormRef: PropTypes.object.isRequired
 }
+
+// --------------------------------PROP VALIDATION-----------------------------------
 
 export default BlogForm

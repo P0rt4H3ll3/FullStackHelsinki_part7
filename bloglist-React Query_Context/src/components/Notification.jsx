@@ -4,10 +4,10 @@ import { useNotificationMessage } from '../NotificatonContext'
 const Notification = () => {
   const message = useNotificationMessage()
   if (!message) return null
-  return message.includes('Error') ? (
-    <div className="error">{message}</div>
-  ) : (
-    <div className="success">{message}</div>
+  return (
+    <div className={message.includes('Error') ? 'error' : 'success'}>
+      {message}
+    </div>
   )
 }
 

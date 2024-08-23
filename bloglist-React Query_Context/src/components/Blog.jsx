@@ -1,8 +1,20 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
+import blogService from '../services/blogs'
+import { useNotificationDispatch } from '../NotificatonContext.jsx'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-const Blog = ({ blog, transferIdToParent, username, transferIdToDelete }) => {
+// --------------------------------COMPONENT START-------------------------------------------
+
+const Blog = ({ blog, username }) => {
   const [visible, setVisible] = useState(false)
+
+  const queryClient = useQueryClient()
+  const messageDispatch = useNotificationDispatch()
+
+  // --------------------------------COMPONENT START-------------------------------------------
+
+  // --------------------------------TOGGLE VISIBILITY-----------------------------------------
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -15,8 +27,34 @@ const Blog = ({ blog, transferIdToParent, username, transferIdToDelete }) => {
     setVisible(!visible)
   }
 
+  // --------------------------------TOGGLE VISIBILITY-----------------------------------------
+
+  // --------------------------------UPDATE BLOGS----------------------------------------------
+
+  const updateBlogMutation = useMutation({
+    mutationFn: async (blog) => await blogService.update(blog),
+    onSuccess: (blogResponse) => {
+      const blogs = queryClient.getQueryData(['blogs'])
+      queryClient.setQueriesData(
+        ['blogs'],
+        blogs.map((b) => (b.id !== blogResponse.id ? b : blogResponse))
+      )
+
+      messageDispatch({
+        type: 'SET_NOTIFICATION',
+        payload: `blog ${blogResponse.title} by ${blogResponse.author} was updated`
+      })
+    },
+    onError: (exception) => {
+      messageDispatch({
+        type: 'SET_NOTIFICATION',
+        payload: `An Error Occured while updating the blog: ${exception.response.data.error}`
+      })
+    }
+  })
+
   const updateLikeHandler = () => {
-    transferIdToParent({
+    updateBlogMutation.mutate({
       title: blog.title,
       author: blog.author,
       url: blog.url,
@@ -25,12 +63,40 @@ const Blog = ({ blog, transferIdToParent, username, transferIdToDelete }) => {
     })
   }
 
+  // --------------------------------UPDATE BLOGS----------------------------------------------
+
+  // --------------------------------DELETE BLOGS----------------------------------------------
+
+  const deleteBlogMutation = useMutation({
+    mutationFn: async (blog) => await blogService.deleteBlog(blog),
+    onSuccess: (_, variables) => {
+      const blogs = queryClient.getQueryData(['blogs'])
+      queryClient.setQueriesData(
+        ['blogs'],
+        blogs.filter((b) => b.id !== variables.id)
+      )
+
+      messageDispatch({
+        type: 'SET_NOTIFICATION',
+        payload: 'deleted Blog'
+      })
+    },
+    onError: (exception) => {
+      messageDispatch({
+        type: 'SET_NOTIFICATION',
+        payload: `An Error Occured while updating the blog: ${exception.response.data.error}`
+      })
+    }
+  })
+
   const deleteHandler = () => {
     if (window.confirm(`Remove Blog: ${blog.title} by ${blog.author}`)) {
-      transferIdToDelete(blog)
+      deleteBlogMutation.mutate(blog)
     }
   }
+  // --------------------------------DELETE BLOGS----------------------------------------------
 
+  // --------------------------------RETURN COMPONENTS-----------------------------------------
   return (
     <div style={blogStyle} className="blog">
       <div className="BlogSmallView" style={{ display: 'flex', gap: '8px' }}>
@@ -77,11 +143,14 @@ const Blog = ({ blog, transferIdToParent, username, transferIdToDelete }) => {
     </div>
   )
 }
+// --------------------------------RETURN COMPONENTS-----------------------------------------
+
+// --------------------------------PROP VALIDATION --------------------------------------------
 
 Blog.propTypes = {
   blog: PropTypes.object.isRequired,
-  transferIdToParent: PropTypes.func.isRequired,
-  username: PropTypes.string.isRequired,
-  transferIdToDelete: PropTypes.func.isRequired
+  username: PropTypes.string.isRequired
 }
+
+// --------------------------------PROP VALIDATION --------------------------------------------
 export default Blog

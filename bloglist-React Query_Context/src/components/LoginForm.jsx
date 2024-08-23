@@ -1,17 +1,54 @@
 import { useState } from 'react'
-import PropTypes from 'prop-types'
 
-const LoginForm = ({ transferLoginToParent }) => {
+import loginService from '../services/login'
+import blogService from '../services/blogs'
+
+import { useNotificationDispatch } from '../NotificatonContext.jsx'
+import { useUserDispatch } from '../UserContext.jsx'
+
+const LoginForm = () => {
+  // --------------------------------USESTATE----------------------------------
   const [username, setUsername] = useState([''])
   const [password, setPassword] = useState([''])
+  // --------------------------------USESTATE----------------------------------
 
+  // --------------------------------HOOKS AND DISPATCHES------------------------------
+  const messageDispatch = useNotificationDispatch()
+  const userDispatch = useUserDispatch()
+  // --------------------------------HOOKS AND DISPATCHES------------------------------
+
+  // --------------------------------LOGIN HANDLER-------------------------------------
+
+  const handleLogin = async (username, password) => {
+    try {
+      const user = await loginService.login({
+        username,
+        password
+      })
+      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
+      blogService.setToken(user.token)
+      userDispatch({ type: 'USER_LOGIN', payload: user })
+      messageDispatch({
+        type: 'SET_NOTIFICATION',
+        payload: `logged in as ${user.name}`
+      })
+    } catch (exception) {
+      messageDispatch({
+        type: 'SET_NOTIFICATION',
+        payload: `Error : ${exception.response.data.error}`
+      })
+    }
+  }
   const handleSubmit = (event) => {
     event.preventDefault()
-    transferLoginToParent(username, password)
+    handleLogin(username, password)
     setPassword('')
     setUsername('')
   }
 
+  // --------------------------------LOGIN HANDLER-------------------------------------
+
+  // --------------------------------COMPONENT RETURN----------------------------------
   return (
     <>
       <h2>Log into BlogApp:</h2>
@@ -42,7 +79,6 @@ const LoginForm = ({ transferLoginToParent }) => {
   )
 }
 
-LoginForm.propTypes = {
-  transferLoginToParent: PropTypes.func.isRequired
-}
+// --------------------------------COMPONENT RETURN----------------------------------
+
 export default LoginForm
