@@ -27,15 +27,17 @@ const User = () => {
   if (!users || users.length === 0) {
     return <div>No users found</div>
   }
-  console.log('this is users', users)
+
   const user = match ? users.find((user) => user.id === match.params.id) : null
   return (
     <div>
       <h2>{user.name}</h2>
       <h3>added blogs</h3>
-      {user.blogs.map((b) => {
-        return <li key={b.id}>{b.title}</li>
-      })}
+      <ul>
+        {user.blogs.map((b) => {
+          return <li key={b.id}>{b.title}</li>
+        })}
+      </ul>
     </div>
   )
 }

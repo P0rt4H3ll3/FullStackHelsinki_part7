@@ -1,19 +1,13 @@
 import { useRef } from 'react'
 
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Link,
-  Navigate
-} from 'react-router-dom'
+import { Routes, Route, Link, Navigate } from 'react-router-dom'
 
-import Blogs from './components/Blogs'
+import BlogsOverview from './components/BlogsOverview'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
 import User from './components/User'
 import Users from './components/Users'
-import Togglable from './components/Togglable'
+import Blog from './components/Blog'
 
 import { useNotificationDispatch } from './NotificatonContext'
 import { useUserDispatch, useUserValue } from './UserContext'
@@ -49,40 +43,44 @@ const App = () => {
         <h2>blogs</h2>
         <Notification />
       </div>
-      <Router>
-        <div>
-          <Link style={padding} to="/">
-            home
+      <nav
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-start'
+        }}
+      >
+        <Link style={padding} to="/blogs">
+          blogs
+        </Link>
+        <Link style={padding} to="/users">
+          users
+        </Link>
+        {user === null ? (
+          <Link style={padding} to="/login">
+            login
           </Link>
-          <Link style={padding} to="/blogs">
-            blogs
-          </Link>
-          <Link style={padding} to="/users">
-            users
-          </Link>
-          {user === null ? (
-            <Link style={padding} to="/login">
-              login
-            </Link>
-          ) : (
-            <div>
-              <p>{user.name} logged in</p>
-              <button onClick={handleLogout}>Logout</button>
-            </div>
-          )}
-        </div>
-        <Routes>
-          {/* <Route path="/blogs/:id" element={<Blog blog={blog} />} /> */}
-          <Route path="/blogs" element={<Blogs blogFormRef={blogFormRef} />} />
-          <Route
-            path="/users"
-            element={user ? <Users /> : <Navigate replace to="/login" />}
-          />
-          <Route path="/users/:id" element={<User />} />
-          <Route path="/login" element={<LoginForm />} />
-          {/* <Route path="/" element={<Home />} /> */}
-        </Routes>
-      </Router>
+        ) : (
+          <>
+            <p>{user.name} logged in </p>
+            <button onClick={handleLogout}>Logout</button>
+          </>
+        )}
+      </nav>
+      <Routes>
+        <Route path="/blogs/:id" element={<Blog />} />
+        <Route
+          path="/blogs"
+          element={<BlogsOverview blogFormRef={blogFormRef} />}
+        />
+        <Route
+          path="/users"
+          element={user ? <Users /> : <Navigate replace to="/login" />}
+        />
+        <Route path="/users/:id" element={<User />} />
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/" element={<BlogsOverview />} />
+      </Routes>
     </>
   )
 }

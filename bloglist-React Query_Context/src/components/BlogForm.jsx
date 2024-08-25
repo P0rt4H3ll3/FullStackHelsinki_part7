@@ -87,7 +87,7 @@ const BlogForm = ({ blogFormRef }) => {
             <td>url:</td>
             <td>
               <input
-                type="text"
+                type="url"
                 name="url"
                 value={url}
                 className="urlInput"
