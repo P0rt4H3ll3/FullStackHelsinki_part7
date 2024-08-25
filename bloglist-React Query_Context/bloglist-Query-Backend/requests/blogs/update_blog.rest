@@ -1,0 +1,10 @@
+PUT http://localhost:3003/api/blogs/66a7bb0eec218b6be25a14ce
+Content-Type: application/json
+
+{
+  "title": "jwt blog post 5",
+  "author": "bananenphil-web5",
+  "url": "https://websiteofwonders5.de",
+  "likes": 200,
+  "user":"6696cef8d1726dce5f5c8f16"
+}

@@ -1,0 +1,30 @@
+
+POST http://localhost:3003/api/users
+Content-Type: application/json
+
+{
+  "username": "PhillipForLogin",
+  "name": "LoginTester",
+  "password": "12345"
+}
+###
+POST http://localhost:3003/api/users
+Content-Type: application/json
+
+{
+  "username": "user",
+  "name": "user manila",
+  "password": "12345"
+}
+
+###
+#Create user for Test Env Port 3001 ?
+POST http://localhost:3003/api/users
+Content-Type: application/json
+
+{
+  "username": "user",
+  "name": "user manila",
+  "password": "12345"
+}
+

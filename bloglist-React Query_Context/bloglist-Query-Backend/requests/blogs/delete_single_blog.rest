@@ -1,0 +1,6 @@
+DELETE http://localhost:3003/api/blogs/6697a7602e62af2aa003b7ff
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlBoaWxsaXBGb3JMb2dpbiIsImlkIjoiNjY5NmNlZjhkMTcyNmRjZTVmNWM4ZjE2IiwiaWF0IjoxNzIxMjE4ODM0fQ.hWHUGjeny4UgW8Xo7bqa5CvmklBv1_TpM7XevV6HWUQ
+
+###
+#before the use of jwt
+DELETE http://localhost:3003/api/blogs/66966a27886556a2b39e6f60
