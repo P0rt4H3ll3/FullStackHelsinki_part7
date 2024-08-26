@@ -5,9 +5,12 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const Comment = require('../models/comments')
 
 blogsRouter.get('/', async (request, response) => {
-  const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
+  const blogs = await Blog.find({})
+    .populate('user', { username: 1, name: 1 })
+    .populate('comments', { content: 1 })
   response.json(blogs)
 })
 
@@ -33,10 +36,12 @@ blogsRouter.post('/', async (request, response) => {
   user.blogs = user.blogs.concat(addedBlog._id) // user.blogs is the array of blogs the user has posted, the just posted blog id is added using concat or spread operator to generat new array, does not change existing array
   await user.save()
 
-  const populatedBlog = await Blog.findById(addedBlog._id).populate('user', {
-    username: 1,
-    name: 1
-  })
+  const populatedBlog = await Blog.findById(addedBlog._id)
+    .populate('user', {
+      username: 1,
+      name: 1
+    })
+    .populate('comments', { content: 1 })
   response.status(201).json(populatedBlog)
 })
 
@@ -73,20 +78,52 @@ blogsRouter.put('/:id', async (request, response) => {
   }
   const blogToUpdate = await Blog.findByIdAndUpdate(request.params.id, uBlog, {
     new: true
-  }).populate('user', { username: 1, name: 1 }) //so it works with part5 update the likes and display the username
+  })
+    .populate('user', { username: 1, name: 1 }) //so it works with part5 update the likes and display the username
+    .populate('comments', { content: 1 })
   response.json(blogToUpdate)
 })
 
 blogsRouter.post('/:id/comments', async (request, response) => {
-  const match = request.url.match(/(?<=\/)[^\/]+(?=\/comments)/)
-  const id = match[0]
+  const { id } = request.params
+  const body = request.body
   const blog = await Blog.findById(id)
 
   if (!blog) {
     return response.status(404)
   }
-  blog.comments = [...blog.comments, request.body.comment]
-  const newCommentBlog = await blog.save()
-  response.status(201).json(newCommentBlog)
+
+  const comment = new Comment({
+    ...body,
+    blog: blog._id
+  })
+  const newComment = await comment.save()
+
+  blog.comments = blog.comments.concat(newComment._id)
+  await blog.save()
+
+  const populatedComment = await Comment.findById(newComment._id).populate(
+    'blog',
+    {
+      title: 1,
+      id: 1
+    }
+  )
+
+  response.status(201).json(populatedComment)
+})
+
+blogsRouter.delete('/:id/comments', async (request, response) => {
+  const blog = await Blog.findById(request.params.id)
+
+  if (!blog) {
+    response.status(404).json({ error: 'no blog found' })
+  }
+  //delet all comments associated with the blog
+  await Comment.deleteMany({ blog: blog._id })
+  // Clear the comments array in the blog document
+  blog.comments = []
+  await blog.save()
+  return response.status(200).json({ message: 'All Comments deleted ', blog })
 })
 module.exports = blogsRouter

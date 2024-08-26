@@ -1,7 +1,7 @@
-POST http://localhost:3003/api/blogs/66cb7c288fa8c283d20484ab/comments
+POST http://localhost:3003/api/blogs/66cc293dd905e1760ab6e9aa/comments
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlBoaWxsaXBGb3JMb2dpbiIsImlkIjoiNjZjNWI4YjYyZmQ4OWRmZjRlNWIyYTU2IiwiaWF0IjoxNzI0NjExNTMyfQ.Dh9-ePFdufo2eukcUfKEVZtd_RFYKE8ADqI5m5dSgXg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlBoaWxsaXBGb3JMb2dpbiIsImlkIjoiNjZjNWI4YjYyZmQ4OWRmZjRlNWIyYTU2IiwiaWF0IjoxNzI0NjU1NzA0fQ.vrgNVK9aTG0ofqp_sZSqa5uzhLrQtboUFwWjS-Fq8tM
 
 {
-  "comment": "the token is from PhillipForLogin"
+  "content": "comment content TEST"
 }

@@ -1,10 +1,9 @@
-import { useState } from 'react'
-import PropTypes from 'prop-types'
 import blogService from '../services/blogs.js'
 import { useNotificationDispatch } from '../NotificatonContext.jsx'
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 import { useUserValue } from '../UserContext.jsx'
 import { useMatch, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 
 // --------------------------------COMPONENT START-------------------------------------------
 
@@ -12,9 +11,11 @@ const Blog = () => {
   const user = useUserValue()
   const queryClient = useQueryClient()
   const messageDispatch = useNotificationDispatch()
+  const [comment, setComment] = useState('')
 
   const match = useMatch('/blogs/:id')
   const navigate = useNavigate()
+
   // --------------------------------COMPONENT START-------------------------------------------
   const {
     data: blogs,
@@ -52,11 +53,8 @@ const Blog = () => {
 
   const updateLikeHandler = () => {
     updateBlogMutation.mutate({
-      title: blog.title,
-      author: blog.author,
-      url: blog.url,
-      likes: blog.likes + 1,
-      id: blog.id
+      ...blog,
+      likes: blog.likes + 1
     })
   }
 
@@ -91,6 +89,35 @@ const Blog = () => {
       deleteBlogMutation.mutate(blog)
     }
   }
+  //---------------------------------ADD COMMENT-----------------------------------------------
+
+  const addCommentMutation = useMutation({
+    mutationFn: async ({ id, comment }) =>
+      await blogService.addComment(id, comment),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] })
+
+      messageDispatch({
+        type: 'SET_NOTIFICATION',
+        payload: `commented on blog: ${variables.title}`
+      })
+    },
+    onError: (exception) => {
+      messageDispatch({
+        type: 'SET_NOTIFICATION',
+        payload: `An Error Occured while updating the blog: ${exception.response.data.error}`
+      })
+    }
+  })
+
+  const addCommentHandler = (event) => {
+    event.preventDefault()
+    addCommentMutation.mutate({
+      id: blog.id,
+      comment: comment
+    })
+    setComment('')
+  }
   // --------------------------------DELETE BLOGS----------------------------------------------
 
   if (isLoading) {
@@ -100,8 +127,9 @@ const Blog = () => {
   if (error) {
     return <div>Error loading blog</div>
   }
-
+  if (!blogs) null
   const blog = match ? blogs.find((blog) => blog.id === match.params.id) : null
+
   // --------------------------------RETURN COMPONENTS-----------------------------------------
   return (
     <>
@@ -147,6 +175,26 @@ const Blog = () => {
             </button>
           </div>
         ) : null}
+        <div>
+          <h2>comments</h2>
+          <form onSubmit={addCommentHandler}>
+            <input
+              type="text"
+              name="comment"
+              value={comment}
+              className="commentInput"
+              onChange={({ target }) => setComment(target.value)}
+              data-testid="blog-comment"
+              placeholder="comment this blog"
+            />
+            <button type="submit">add comment</button>
+          </form>
+          <ul>
+            {blog.comments.map((c) => (
+              <li key={c.id}>{c.content}</li>
+            ))}
+          </ul>
+        </div>
       </div>
     </>
   )
@@ -154,12 +202,4 @@ const Blog = () => {
 
 // --------------------------------RETURN COMPONENTS-----------------------------------------
 
-// --------------------------------PROP VALIDATION --------------------------------------------
-
-Blog.propTypes = {
-  blog: PropTypes.object.isRequired,
-  username: PropTypes.string.isRequired
-}
-
-// --------------------------------PROP VALIDATION --------------------------------------------
 export default Blog

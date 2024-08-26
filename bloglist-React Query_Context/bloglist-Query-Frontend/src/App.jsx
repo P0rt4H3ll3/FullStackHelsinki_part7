@@ -1,5 +1,3 @@
-import { useRef } from 'react'
-
 import { Routes, Route, Link, Navigate } from 'react-router-dom'
 
 import BlogsOverview from './components/BlogsOverview'
@@ -17,7 +15,6 @@ const App = () => {
   const messageDispatch = useNotificationDispatch()
   const userDispatch = useUserDispatch()
   const user = useUserValue()
-  const blogFormRef = useRef()
 
   // --------------------------------HOOKS------------------------------------------
 
@@ -69,10 +66,7 @@ const App = () => {
       </nav>
       <Routes>
         <Route path="/blogs/:id" element={<Blog />} />
-        <Route
-          path="/blogs"
-          element={<BlogsOverview blogFormRef={blogFormRef} />}
-        />
+        <Route path="/blogs" element={<BlogsOverview />} />
         <Route
           path="/users"
           element={user ? <Users /> : <Navigate replace to="/login" />}

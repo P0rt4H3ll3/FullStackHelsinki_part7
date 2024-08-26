@@ -110,10 +110,6 @@ const BlogForm = ({ blogFormRef }) => {
 
 // --------------------------------PROP VALIDATION-----------------------------------
 
-BlogForm.propTypes = {
-  blogFormRef: PropTypes.object.isRequired
-}
-
 // --------------------------------PROP VALIDATION-----------------------------------
 
 export default BlogForm

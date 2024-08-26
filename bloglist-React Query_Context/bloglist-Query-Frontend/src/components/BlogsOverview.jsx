@@ -2,12 +2,14 @@ import Togglable from './Togglable.jsx'
 import BlogForm from './BlogForm.jsx'
 
 import { Link } from 'react-router-dom'
+import { useRef } from 'react'
 
 import blogService from '../services/blogs.js'
 
 import { useQuery } from '@tanstack/react-query'
 
-const BlogsOverview = ({ blogFormRef }) => {
+const BlogsOverview = () => {
+  const blogFormRef = useRef()
   // --------------------------------QUERY-------------------------------------------
   const result = useQuery({
     queryKey: ['blogs'],
