@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import PropTypes from 'prop-types'
 import { useNotificationDispatch } from '../NotificatonContext.jsx'
 import blogService from '../services/blogs'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { Button, Box, Paper, TextField, Typography } from '@mui/material'
 
 const BlogForm = ({ blogFormRef }) => {
   // --------------------------------STATE------------------------------------------
@@ -52,56 +52,72 @@ const BlogForm = ({ blogFormRef }) => {
   // --------------------------------RETURN COMPONENT-----------------------------------------
   return (
     <form onSubmit={handleCreate}>
-      <h2>create new</h2>
-      <table>
-        <tbody>
-          <tr>
-            <td>title:</td>
-            <td>
-              <input
-                type="text"
-                name="title"
-                value={title}
-                className="titleInput"
-                onChange={({ target }) => setTitle(target.value)}
-                data-testid="blog-title"
-              />
-            </td>
-          </tr>
-
-          <tr>
-            <td>author:</td>
-            <td>
-              <input
-                type="text"
-                name="author"
-                value={author}
-                className="authorInput"
-                onChange={({ target }) => setAuthor(target.value)}
-                data-testid="blog-author"
-              />
-            </td>
-          </tr>
-
-          <tr>
-            <td>url:</td>
-            <td>
-              <input
-                type="url"
-                name="url"
-                value={url}
-                className="urlInput"
-                onChange={({ target }) => setUrl(target.value)}
-                data-testid="blog-url"
-              />
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <button type="submit" className="createNewBlogButton">
-        create
-      </button>
+      <Box>
+        <Typography variant="h4" sx={{ my: 2 }}>
+          Create new
+        </Typography>
+      </Box>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1,
+          mx: 4
+        }}
+      >
+        <Paper>
+          <div>
+            <TextField
+              fullWidth
+              label="title"
+              type="text"
+              name="title"
+              value={title}
+              className="titleInput"
+              onChange={({ target }) => setTitle(target.value)}
+              data-testid="blog-title"
+            />
+          </div>
+          <div>
+            <TextField
+              fullWidth
+              label="author"
+              type="text"
+              name="author"
+              value={author}
+              className="authorInput"
+              onChange={({ target }) => setAuthor(target.value)}
+              data-testid="blog-author"
+            />
+          </div>
+          <div>
+            <TextField
+              fullWidth
+              label="url"
+              type="url"
+              name="url"
+              value={url}
+              className="urlInput"
+              onChange={({ target }) => setUrl(target.value)}
+              data-testid="blog-url"
+            />
+          </div>
+        </Paper>
+      </Box>
+      <Box>
+        <Button
+          color="primary"
+          variant="contained"
+          sx={{
+            my: 2,
+            ':hover': { bgcolor: '#cbc86d' }
+          }}
+          type="submit"
+          className="createNewBlogButton"
+        >
+          create
+        </Button>
+      </Box>
     </form>
   )
 }

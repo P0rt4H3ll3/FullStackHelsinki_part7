@@ -1,13 +1,14 @@
 import PropTypes from 'prop-types'
 import { useNotificationMessage } from '../NotificatonContext'
+import { Alert } from '@mui/material'
 
 const Notification = () => {
   const message = useNotificationMessage()
   if (!message) return null
   return (
-    <div className={message.includes('Error') ? 'error' : 'success'}>
+    <Alert severity={message.includes('Error') ? 'error' : 'success'}>
       {message}
-    </div>
+    </Alert>
   )
 }
 

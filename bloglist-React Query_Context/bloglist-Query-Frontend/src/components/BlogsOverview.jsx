@@ -1,5 +1,15 @@
 import Togglable from './Togglable.jsx'
 import BlogForm from './BlogForm.jsx'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Paper,
+  Typography,
+  Box
+} from '@mui/material'
 
 import { Link } from 'react-router-dom'
 import { useRef } from 'react'
@@ -26,37 +36,35 @@ const BlogsOverview = () => {
       </Togglable>
     )
   }
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5
-  }
+
   const blogList = () => {
     return (
-      <div>
-        {(blogs ? [...blogs] : [])
-          .sort((a, b) => b.likes - a.likes)
-          .map((blog) => (
-            <div key={blog.id} style={blogStyle} className="blog">
-              <div
-                className="BlogSmallView"
-                style={{ display: 'flex', gap: '8px' }}
-              >
-                <Link to={`/blogs/${blog.id}`}>
-                  {blog.title} {blog.author}
-                </Link>
-              </div>
-            </div>
-          ))}
-      </div>
+      <TableContainer component={Paper} sx={{ elevation: 12 }}>
+        <Table>
+          <TableBody>
+            {(blogs ? [...blogs] : [])
+              .sort((a, b) => b.likes - a.likes)
+              .map((blog) => (
+                <TableRow key={blog.id}>
+                  <TableCell>
+                    <Typography variant="h6">
+                      <Link to={`/blogs/${blog.id}`}>
+                        {blog.title} {blog.author}
+                      </Link>
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">{blog.user.name}</TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     )
   }
 
   return (
     <div>
-      {blogForm()}
+      <Box sx={{ my: 4 }}>{blogForm()}</Box>
       {blogList()}
     </div>
   )

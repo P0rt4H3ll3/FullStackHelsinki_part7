@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import { TextField, Button, Box, Typography, Paper } from '@mui/material'
 
 import loginService from '../services/login'
 import blogService from '../services/blogs'
 
 import { useNotificationDispatch } from '../NotificatonContext.jsx'
 import { useUserDispatch } from '../UserContext.jsx'
+import { useNavigate } from 'react-router-dom'
 
 const LoginForm = () => {
   // --------------------------------USESTATE----------------------------------
@@ -15,6 +17,7 @@ const LoginForm = () => {
   // --------------------------------HOOKS AND DISPATCHES------------------------------
   const messageDispatch = useNotificationDispatch()
   const userDispatch = useUserDispatch()
+  const navigate = useNavigate()
   // --------------------------------HOOKS AND DISPATCHES------------------------------
 
   // --------------------------------LOGIN HANDLER-------------------------------------
@@ -44,6 +47,7 @@ const LoginForm = () => {
     handleLogin(username, password)
     setPassword('')
     setUsername('')
+    navigate('/')
   }
 
   // --------------------------------LOGIN HANDLER-------------------------------------
@@ -51,29 +55,51 @@ const LoginForm = () => {
   // --------------------------------COMPONENT RETURN----------------------------------
   return (
     <>
-      <h2>Log into BlogApp:</h2>
+      <Paper sx={{ p: 2 }}>
+        <Typography variant="h4">Log into BlogApp:</Typography>
+      </Paper>
+
       <form onSubmit={handleSubmit}>
-        <div>
-          username
-          <input
-            type="text"
-            value={username}
-            name="Username"
-            onChange={({ target }) => setUsername(target.value)}
-            data-testid="username"
-          />
-        </div>
-        <div>
-          password
-          <input
-            type="password"
-            value={password}
-            name="Password"
-            onChange={({ target }) => setPassword(target.value)}
-            data-testid="password"
-          />
-        </div>
-        <button type="submit">login</button>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 1,
+            my: 4
+          }}
+        >
+          <div>
+            <TextField
+              fullWidth
+              label="username"
+              type="text"
+              value={username}
+              name="Username"
+              onChange={({ target }) => setUsername(target.value)}
+              data-testid="username"
+            />
+          </div>
+          <div>
+            <TextField
+              fullWidth
+              label="password"
+              type="password"
+              value={password}
+              name="Password"
+              onChange={({ target }) => setPassword(target.value)}
+              data-testid="password"
+            />
+          </div>
+        </Box>
+
+        <Button
+          variant="contained"
+          color="primary"
+          type="submit"
+          sx={{ mx: 4, mb: 4 }}
+        >
+          login
+        </Button>
       </form>
     </>
   )

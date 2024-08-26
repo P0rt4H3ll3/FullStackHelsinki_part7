@@ -5,6 +5,17 @@ import { useUserValue } from '../UserContext.jsx'
 import { useMatch, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 
+import {
+  Divider,
+  Paper,
+  Box,
+  Button,
+  TextField,
+  Typography,
+  List,
+  Link
+} from '@mui/material'
+
 // --------------------------------COMPONENT START-------------------------------------------
 
 const Blog = () => {
@@ -114,7 +125,8 @@ const Blog = () => {
     event.preventDefault()
     addCommentMutation.mutate({
       id: blog.id,
-      comment: comment
+      comment: comment,
+      title: blog.title
     })
     setComment('')
   }
@@ -128,72 +140,177 @@ const Blog = () => {
     return <div>Error loading blog</div>
   }
   if (!blogs) null
+
   const blog = match ? blogs.find((blog) => blog.id === match.params.id) : null
 
   // --------------------------------RETURN COMPONENTS-----------------------------------------
   return (
     <>
       <div className="BlogBigView">
-        <h1>{blog.title}</h1>
-        <a
-          href={blog.url}
-          onClick={(e) => {
-            e.preventDefault()
-            if (window.confirm('this URL goes nowhere')) {
-              return null
-            }
+        <Divider
+          sx={{ mt: 2 }}
+          orientation="horizontal"
+          flexItem
+          textAlign="left"
+        >
+          <Typography variant="h5">Title</Typography>
+        </Divider>
+        <Box sx={{ display: 'flex', flexDirection: 'column', my: 2 }}>
+          <Paper sx={{ elevation: 12 }}>
+            <Typography variant="h6" sx={{ my: 2, mx: 4 }}>
+              {blog.title}
+            </Typography>
+          </Paper>
+        </Box>
+        <Divider orientation="horizontal" flexItem textAlign="left">
+          <Typography variant="h5">URL</Typography>
+        </Divider>
+        <Divider orientation="horizontal" flexItem>
+          <Typography variant="h5">Likes</Typography>
+        </Divider>
+        <Divider orientation="horizontal" flexItem textAlign="right">
+          <Typography variant="h5">User</Typography>
+        </Divider>
+
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            gap: 4
           }}
         >
-          {blog.url}
-        </a>
-        <div>
-          <span>{blog.likes} likes </span>
-          <button onClick={updateLikeHandler} className="blogLikeButton">
-            like
-          </button>
-        </div>
-        <div>
-          <span>added by {blog.user.name}</span>
-        </div>
-        {blog.user.username === user.username ? (
-          <div>
-            <button
-              onClick={deleteHandler}
-              className="deleteButton"
-              style={{
-                backgroundColor: 'dodgerblue',
-                color: 'black',
-                border: 'none',
-                margin: '2px',
-                padding: '2px 10px',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                fontSize: '13px'
+          <Paper
+            sx={{
+              elevation: 12,
+              width: 300,
+              height: 150, // Adjust height as needed
+              display: 'flex',
+              justifyContent: 'center', // Centers content horizontally
+              alignItems: 'center' // Centers content vertically
+            }}
+          >
+            <Link
+              href={blog.url}
+              sx={{ textAlign: 'center' }}
+              onClick={(e) => {
+                e.preventDefault()
+                if (window.confirm('this URL goes nowhere')) {
+                  return null
+                }
               }}
             >
-              remove
-            </button>
-          </div>
-        ) : null}
+              <Typography>{blog.url}</Typography>
+            </Link>
+          </Paper>
+          <Paper
+            sx={{
+              elevation: 12,
+              width: 300,
+              height: 150, // Adjust height as needed
+              display: 'flex',
+              justifyContent: 'center', // Centers content horizontally
+              alignItems: 'center' // Centers content vertically
+            }}
+          >
+            <Typography>{blog.likes} likes </Typography>
+            <Button
+              onClick={updateLikeHandler}
+              className="blogLikeButton"
+              size="small"
+              color="primary"
+              variant="contained"
+              sx={{
+                variant: 'contained',
+                ':hover': { bgcolor: '#cbc86d' },
+                m: 2
+              }}
+            >
+              like
+            </Button>
+          </Paper>
+          <Paper
+            sx={{
+              elevation: 12,
+              width: 300,
+              height: 150, // Adjust height as needed
+              display: 'flex',
+              justifyContent: 'center', // Centers content horizontally
+              alignItems: 'center' // Centers content vertically
+            }}
+          >
+            <div>
+              <Typography>
+                added by <br />
+                {blog.user.name}
+              </Typography>
+            </div>
+            {blog.user.username === user.username ? (
+              <div>
+                <Button
+                  onClick={deleteHandler}
+                  className="deleteButton"
+                  size="small"
+                  color="primary"
+                  variant="contained"
+                  sx={{
+                    mx: 2,
+                    ':hover': { bgcolor: '#cbc86d' }
+                  }}
+                >
+                  remove
+                </Button>
+              </div>
+            ) : null}
+          </Paper>
+        </Box>
         <div>
-          <h2>comments</h2>
-          <form onSubmit={addCommentHandler}>
-            <input
-              type="text"
-              name="comment"
-              value={comment}
-              className="commentInput"
-              onChange={({ target }) => setComment(target.value)}
-              data-testid="blog-comment"
-              placeholder="comment this blog"
-            />
-            <button type="submit">add comment</button>
-          </form>
-          <ul>
-            {blog.comments.map((c) => (
-              <li key={c.id}>{c.content}</li>
-            ))}
-          </ul>
+          <Divider
+            orientation="horizontal"
+            flexItem
+            textAlign="left"
+            sx={{ my: 4 }}
+          >
+            <Typography variant="h5">Comments</Typography>
+          </Divider>
+          <Paper>
+            <form onSubmit={addCommentHandler}>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  type="text"
+                  name="comment"
+                  value={comment}
+                  className="commentInput"
+                  onChange={({ target }) => setComment(target.value)}
+                  data-testid="blog-comment"
+                  placeholder="comment this blog"
+                />
+                <Button
+                  type="submit"
+                  size="medium"
+                  color="primary"
+                  variant="contained"
+                  sx={{
+                    marginLeft: '8px',
+                    // p: '4px 8px',
+                    minWidth: 'auto',
+                    whiteSpace: 'nowrap',
+                    ':hover': { bgcolor: '#cbc86d' }
+                  }}
+                >
+                  add comment
+                </Button>
+              </Box>
+            </form>
+          </Paper>
+
+          {blog.comments.map((c) => (
+            <Paper key={c.id} sx={{ my: 2 }}>
+              <List sx={{ mx: 2 }}>{c.content}</List>
+            </Paper>
+          ))}
         </div>
       </div>
     </>
